@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	storage := repositories.NewMemStorage()
+	storage := repositories.NewDefaultMemStorage()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", serverhandlers.HandlerOther)
