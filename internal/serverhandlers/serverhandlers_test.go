@@ -51,6 +51,7 @@ func TestHandlerOther(t *testing.T) {
 			HandlerOther(w, request)
 
 			res := w.Result()
+			defer res.Body.Close() // Закрываем тело ответа
 			// проверяем код ответа
 			assert.Equal(t, tt.want.code, res.StatusCode)
 		})
@@ -198,6 +199,7 @@ func TestHandlerUpdate(t *testing.T) {
 			HandlerUpdate(w, request, &tt.arg)
 
 			res := w.Result()
+			defer res.Body.Close() // Закрываем тело ответа
 			// проверяем код ответа
 			assert.Equal(t, tt.want.code, res.StatusCode)
 			assert.Equal(t, tt.want.storage, *stor)
