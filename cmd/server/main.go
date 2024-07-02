@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/AntonBezemskiy/go-musthave-metrics/internal/repositories"
@@ -18,6 +19,6 @@ func main() {
 
 	err := http.ListenAndServe("localhost:8080", mux)
 	if err != nil {
-		//panic(err)
+		log.Fatalf("Server failed to start: %v", err)
 	}
 }
