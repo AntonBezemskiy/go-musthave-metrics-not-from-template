@@ -8,9 +8,9 @@ import (
 
 func main() {
 	var metrics agenthandlers.MetricsStats
-	go agenthandlers.CollectMetrics(&metrics)
+	go agenthandlers.CollectMetricsTimer(&metrics)
 	time.Sleep(50 * time.Millisecond)
-	go agenthandlers.PushMetrics("http://localhost:8080", "update", &metrics)
+	go agenthandlers.PushMetricsTimer("http://localhost:8080", "update", &metrics)
 
 	// блокировка main, чтобы функции бесконечно выполнялись
 	select {}

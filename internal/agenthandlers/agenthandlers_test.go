@@ -7,7 +7,8 @@ import (
 )
 
 func TestCollectMetrics(t *testing.T) {
-	var metrics MetricsStats
+
+	metrics := &MetricsStats{}
 
 	tests := []struct {
 		name string
@@ -15,15 +16,15 @@ func TestCollectMetrics(t *testing.T) {
 		want int64
 	}{
 		{name: "Counter test #1",
-			arg:  &metrics,
+			arg:  metrics,
 			want: 1,
 		},
 		{name: "Counter test #2",
-			arg:  &metrics,
+			arg:  metrics,
 			want: 2,
 		},
 		{name: "Counter test #3",
-			arg:  &metrics,
+			arg:  metrics,
 			want: 3,
 		},
 	}
