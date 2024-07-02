@@ -1,13 +1,17 @@
 package main
 
 import (
+	"time"
+
 	"github.com/AntonBezemskiy/go-musthave-metrics/internal/agenthandlers"
 )
 
 func main() {
 	var metrics agenthandlers.MetricsStats
-	for {
-		go agenthandlers.CollectMetrics(&metrics)
-		go agenthandlers.PushMetrics("http://localhost", "update", &metrics)
-	}
+	go agenthandlers.CollectMetrics(&metrics)
+	time.Sleep(50 * time.Millisecond)
+	go agenthandlers.PushMetrics("http://localhost:8080", "update", &metrics)
+
+	// блокировка main, чтобы функции бесконечно выполнялись
+	select {}
 }

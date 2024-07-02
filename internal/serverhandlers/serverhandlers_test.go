@@ -191,6 +191,16 @@ func TestHandlerUpdate(t *testing.T) {
 				storage:     *repositories.NewMemStorage(map[string]float64{"testgauge1": 3, "testgauge2": 10}, map[string]int64{"testcount1": 4, "testcount2": 1}),
 			},
 		},
+		{
+			name:    "Counter errort#4",
+			arg:     *stor,
+			request: "/update/gauge/alloc/233184",
+			want: want{
+				code:        200,
+				contentType: "text/plain",
+				storage:     *repositories.NewMemStorage(map[string]float64{"testgauge1": 3, "testgauge2": 10, "alloc": 233184}, map[string]int64{"testcount1": 4, "testcount2": 1}),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
