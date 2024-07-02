@@ -14,6 +14,7 @@ const (
 	reportInterval = 10
 )
 
+// MetricsStats структура для хранения метрик
 type MetricsStats struct {
 	sync.Mutex
 	runtime.MemStats
@@ -21,16 +22,15 @@ type MetricsStats struct {
 	RandomValue float64
 }
 
+// CollectMetrics собирает метрики
 func CollectMetrics(metrics *MetricsStats) {
 	metrics.Lock()
-	metrics.PollCount += 1
+	defer metrics.Unlock()
+	metrics.PollCount++
 	runtime.ReadMemStats(&metrics.MemStats)
-
-	metrics.Unlock()
-
-	//fmt.Println("Collect metrics")
 }
 
+// CollectMetricsTimer запускает сбор метрик с интервалом
 func CollectMetricsTimer(metrics *MetricsStats) {
 	for {
 		CollectMetrics(metrics)
@@ -38,64 +38,72 @@ func CollectMetricsTimer(metrics *MetricsStats) {
 	}
 }
 
-// При неудачной отправке сообщения можно добавить возвращение ошибки из функции
-func Push(addres, action, typemetric, namemetric, valuemetric string) {
-	url := addres + "/" + action + "/" + typemetric + "/" + namemetric + "/" + valuemetric
+// Push отправляет метрику на сервер и возвращает ошибку при неудаче
+func Push(address, action, typemetric, namemetric, valuemetric string) error {
+	url := fmt.Sprintf("%s/%s/%s/%s/%s", address, action, typemetric, namemetric, valuemetric)
 	resp, err := http.Post(url, "text/plain", nil)
-
 	if err != nil {
-		fmt.Printf("Error with post: %s \n", url)
-		fmt.Println(err)
-		fmt.Print('\n')
+		return fmt.Errorf("error with post: %s, %w", url, err)
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("Error with post: %s \n", url)
-		fmt.Printf("received non-200 response status: %d \n\n", resp.StatusCode)
+		return fmt.Errorf("received non-200 response status: %d for url: %s", resp.StatusCode, url)
+	}
+	return nil
+}
+
+// PushMetrics отправляет все метрики
+func PushMetrics(address, action string, metrics *MetricsStats) {
+	metrics.Lock()
+	defer metrics.Unlock()
+
+	typemetricgauge := "gauge"
+	metricsToSend := []struct {
+		name  string
+		value string
+	}{
+		{"alloc", strconv.FormatUint(metrics.Alloc, 10)},
+		{"buckhashsys", strconv.FormatUint(metrics.BuckHashSys, 10)},
+		{"formatunit", strconv.FormatUint(metrics.Frees, 10)},
+		{"gccpufraction", strconv.FormatFloat(metrics.GCCPUFraction, 'f', 6, 64)},
+		{"gcsys", strconv.FormatUint(metrics.GCSys, 10)},
+		{"heapalloc", strconv.FormatUint(metrics.HeapAlloc, 10)},
+		{"heapidle", strconv.FormatUint(metrics.HeapIdle, 10)},
+		{"heapinuse", strconv.FormatUint(metrics.HeapInuse, 10)},
+		{"heapobjects", strconv.FormatUint(metrics.HeapObjects, 10)},
+		{"heapreleased", strconv.FormatUint(metrics.HeapReleased, 10)},
+		{"heapsys", strconv.FormatUint(metrics.HeapSys, 10)},
+		{"lastgc", strconv.FormatUint(metrics.LastGC, 10)},
+		{"lookups", strconv.FormatUint(metrics.Lookups, 10)},
+		{"mcacheinuse", strconv.FormatUint(metrics.MCacheInuse, 10)},
+		{"mcachesys", strconv.FormatUint(metrics.MCacheSys, 10)},
+		{"mspaninuse", strconv.FormatUint(metrics.MSpanInuse, 10)},
+		{"mspansys", strconv.FormatUint(metrics.MSpanSys, 10)},
+		{"mallocs", strconv.FormatUint(metrics.Mallocs, 10)},
+		{"nextgc", strconv.FormatUint(metrics.NextGC, 10)},
+		{"numforcedgc", strconv.FormatUint(uint64(metrics.NumForcedGC), 10)},
+		{"numgc", strconv.FormatUint(uint64(metrics.NumGC), 10)},
+		{"othersys", strconv.FormatUint(metrics.OtherSys, 10)},
+		{"pausetotalns", strconv.FormatUint(metrics.PauseTotalNs, 10)},
+		{"stackinuse", strconv.FormatUint(metrics.StackInuse, 10)},
+		{"stacksys", strconv.FormatUint(metrics.StackSys, 10)},
+		{"sys", strconv.FormatUint(metrics.Sys, 10)},
+		{"totalalloc", strconv.FormatUint(metrics.TotalAlloc, 10)},
+	}
+
+	for _, metric := range metricsToSend {
+		err := Push(address, action, typemetricgauge, metric.name, metric.value)
+		if err != nil {
+			fmt.Printf("Failed to push metric %s: %v\n", metric.name, err)
+		}
 	}
 }
 
-func PushMetrics(addres, action string, metrics *MetricsStats) {
-	metrics.Lock()
-	typemetricgauge := "gauge"
-	Push(addres, action, typemetricgauge, "alloc", strconv.FormatUint(metrics.Alloc, 10))
-	Push(addres, action, typemetricgauge, "buckhashsys", strconv.FormatUint(metrics.BuckHashSys, 10))
-	Push(addres, action, typemetricgauge, "formatunit", strconv.FormatUint(metrics.Frees, 10))
-	Push(addres, action, typemetricgauge, "gccpufraction", strconv.FormatFloat(metrics.GCCPUFraction, 'f', 6, 64))
-	Push(addres, action, typemetricgauge, "gcsys", strconv.FormatUint(metrics.GCSys, 10))
-	Push(addres, action, typemetricgauge, "heapalloc", strconv.FormatUint(metrics.HeapAlloc, 10))
-	Push(addres, action, typemetricgauge, "heapidle", strconv.FormatUint(metrics.HeapIdle, 10))
-	Push(addres, action, typemetricgauge, "heapinuse", strconv.FormatUint(metrics.HeapInuse, 10))
-	Push(addres, action, typemetricgauge, "heapobjects", strconv.FormatUint(metrics.HeapObjects, 10))
-	Push(addres, action, typemetricgauge, "heapreleased", strconv.FormatUint(metrics.HeapReleased, 10))
-	Push(addres, action, typemetricgauge, "heapsys", strconv.FormatUint(metrics.HeapSys, 10))
-	Push(addres, action, typemetricgauge, "lastgc", strconv.FormatUint(metrics.LastGC, 10))
-	Push(addres, action, typemetricgauge, "lookups", strconv.FormatUint(metrics.Lookups, 10))
-	Push(addres, action, typemetricgauge, "mcacheinuse", strconv.FormatUint(metrics.MCacheInuse, 10))
-	Push(addres, action, typemetricgauge, "mcachesys", strconv.FormatUint(metrics.MCacheSys, 10))
-	Push(addres, action, typemetricgauge, "mspaninuse", strconv.FormatUint(metrics.MSpanInuse, 10))
-	Push(addres, action, typemetricgauge, "mspansys", strconv.FormatUint(metrics.MSpanSys, 10))
-	Push(addres, action, typemetricgauge, "mallocs", strconv.FormatUint(metrics.Mallocs, 10))
-	Push(addres, action, typemetricgauge, "nextgc", strconv.FormatUint(metrics.NextGC, 10))
-	Push(addres, action, typemetricgauge, "numforcedgc", strconv.FormatUint(uint64(metrics.NumForcedGC), 10))
-	Push(addres, action, typemetricgauge, "numgc", strconv.FormatUint(uint64(metrics.NumGC), 10))
-	Push(addres, action, typemetricgauge, "othersys", strconv.FormatUint(metrics.OtherSys, 10))
-	Push(addres, action, typemetricgauge, "pausetotalns", strconv.FormatUint(metrics.PauseTotalNs, 10))
-	Push(addres, action, typemetricgauge, "stackinuse", strconv.FormatUint(metrics.StackInuse, 10))
-	Push(addres, action, typemetricgauge, "stacksys", strconv.FormatUint(metrics.StackSys, 10))
-	Push(addres, action, typemetricgauge, "sys", strconv.FormatUint(metrics.Sys, 10))
-	Push(addres, action, typemetricgauge, "totalalloc", strconv.FormatUint(metrics.TotalAlloc, 10))
-
-	//fmt.Println("Push metrics")
-
-	metrics.Unlock()
-}
-
-func PushMetricsTimer(addres, action string, metrics *MetricsStats) {
+// PushMetricsTimer запускает отправку метрик с интервалом
+func PushMetricsTimer(address, action string, metrics *MetricsStats) {
 	for {
-		PushMetrics(addres, action, metrics)
+		PushMetrics(address, action, metrics)
 		time.Sleep(reportInterval * time.Second)
 	}
 }
