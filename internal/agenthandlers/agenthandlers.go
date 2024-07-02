@@ -58,42 +58,45 @@ func PushMetrics(address, action string, metrics *MetricsStats) {
 	metrics.Lock()
 	defer metrics.Unlock()
 
-	typemetricgauge := "gauge"
 	metricsToSend := []struct {
-		name  string
-		value string
+		typemetricgauge string
+		name            string
+		value           string
 	}{
-		{"alloc", strconv.FormatUint(metrics.Alloc, 10)},
-		{"buckhashsys", strconv.FormatUint(metrics.BuckHashSys, 10)},
-		{"formatunit", strconv.FormatUint(metrics.Frees, 10)},
-		{"gccpufraction", strconv.FormatFloat(metrics.GCCPUFraction, 'f', 6, 64)},
-		{"gcsys", strconv.FormatUint(metrics.GCSys, 10)},
-		{"heapalloc", strconv.FormatUint(metrics.HeapAlloc, 10)},
-		{"heapidle", strconv.FormatUint(metrics.HeapIdle, 10)},
-		{"heapinuse", strconv.FormatUint(metrics.HeapInuse, 10)},
-		{"heapobjects", strconv.FormatUint(metrics.HeapObjects, 10)},
-		{"heapreleased", strconv.FormatUint(metrics.HeapReleased, 10)},
-		{"heapsys", strconv.FormatUint(metrics.HeapSys, 10)},
-		{"lastgc", strconv.FormatUint(metrics.LastGC, 10)},
-		{"lookups", strconv.FormatUint(metrics.Lookups, 10)},
-		{"mcacheinuse", strconv.FormatUint(metrics.MCacheInuse, 10)},
-		{"mcachesys", strconv.FormatUint(metrics.MCacheSys, 10)},
-		{"mspaninuse", strconv.FormatUint(metrics.MSpanInuse, 10)},
-		{"mspansys", strconv.FormatUint(metrics.MSpanSys, 10)},
-		{"mallocs", strconv.FormatUint(metrics.Mallocs, 10)},
-		{"nextgc", strconv.FormatUint(metrics.NextGC, 10)},
-		{"numforcedgc", strconv.FormatUint(uint64(metrics.NumForcedGC), 10)},
-		{"numgc", strconv.FormatUint(uint64(metrics.NumGC), 10)},
-		{"othersys", strconv.FormatUint(metrics.OtherSys, 10)},
-		{"pausetotalns", strconv.FormatUint(metrics.PauseTotalNs, 10)},
-		{"stackinuse", strconv.FormatUint(metrics.StackInuse, 10)},
-		{"stacksys", strconv.FormatUint(metrics.StackSys, 10)},
-		{"sys", strconv.FormatUint(metrics.Sys, 10)},
-		{"totalalloc", strconv.FormatUint(metrics.TotalAlloc, 10)},
+		{"gauge", "alloc", strconv.FormatUint(metrics.Alloc, 10)},
+		{"gauge", "buckhashsys", strconv.FormatUint(metrics.BuckHashSys, 10)},
+		{"gauge", "formatunit", strconv.FormatUint(metrics.Frees, 10)},
+		{"gauge", "gccpufraction", strconv.FormatFloat(metrics.GCCPUFraction, 'f', 6, 64)},
+		{"gauge", "gcsys", strconv.FormatUint(metrics.GCSys, 10)},
+		{"gauge", "heapalloc", strconv.FormatUint(metrics.HeapAlloc, 10)},
+		{"gauge", "heapidle", strconv.FormatUint(metrics.HeapIdle, 10)},
+		{"gauge", "heapinuse", strconv.FormatUint(metrics.HeapInuse, 10)},
+		{"gauge", "heapobjects", strconv.FormatUint(metrics.HeapObjects, 10)},
+		{"gauge", "heapreleased", strconv.FormatUint(metrics.HeapReleased, 10)},
+		{"gauge", "heapsys", strconv.FormatUint(metrics.HeapSys, 10)},
+		{"gauge", "lastgc", strconv.FormatUint(metrics.LastGC, 10)},
+		{"gauge", "lookups", strconv.FormatUint(metrics.Lookups, 10)},
+		{"gauge", "mcacheinuse", strconv.FormatUint(metrics.MCacheInuse, 10)},
+		{"gauge", "mcachesys", strconv.FormatUint(metrics.MCacheSys, 10)},
+		{"gauge", "mspaninuse", strconv.FormatUint(metrics.MSpanInuse, 10)},
+		{"gauge", "mspansys", strconv.FormatUint(metrics.MSpanSys, 10)},
+		{"gauge", "mallocs", strconv.FormatUint(metrics.Mallocs, 10)},
+		{"gauge", "nextgc", strconv.FormatUint(metrics.NextGC, 10)},
+		{"gauge", "numforcedgc", strconv.FormatUint(uint64(metrics.NumForcedGC), 10)},
+		{"gauge", "numgc", strconv.FormatUint(uint64(metrics.NumGC), 10)},
+		{"gauge", "othersys", strconv.FormatUint(metrics.OtherSys, 10)},
+		{"gauge", "pausetotalns", strconv.FormatUint(metrics.PauseTotalNs, 10)},
+		{"gauge", "stackinuse", strconv.FormatUint(metrics.StackInuse, 10)},
+		{"gauge", "stacksys", strconv.FormatUint(metrics.StackSys, 10)},
+		{"gauge", "sys", strconv.FormatUint(metrics.Sys, 10)},
+		{"gauge", "totalalloc", strconv.FormatUint(metrics.TotalAlloc, 10)},
+
+		{"counter", "pollcount", strconv.FormatUint(uint64(metrics.PollCount), 10)},
+		{"gauge", "randomvalue", strconv.FormatFloat(metrics.RandomValue, 'f', 6, 64)},
 	}
 
 	for _, metric := range metricsToSend {
-		err := Push(address, action, typemetricgauge, metric.name, metric.value)
+		err := Push(address, action, metric.typemetricgauge, metric.name, metric.value)
 		if err != nil {
 			fmt.Printf("Failed to push metric %s: %v\n", metric.name, err)
 		}
