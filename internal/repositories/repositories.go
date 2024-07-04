@@ -42,9 +42,9 @@ func (storage *MemStorage) AddCounter(name string, counter int64) {
 	storage.counters[name] += counter
 }
 
-func (storage *MemStorage) GetMetric(metric_type, name string) (string, error) {
+func (storage *MemStorage) GetMetric(metricType, name string) (string, error) {
 
-	if metric_type == "gauge" {
+	if metricType == "gauge" {
 		val, ok := storage.gauges[name]
 		if !ok {
 			return "", fmt.Errorf("metric %s of type gauge not found", name)
@@ -52,7 +52,7 @@ func (storage *MemStorage) GetMetric(metric_type, name string) (string, error) {
 		return fmt.Sprintf("%g", val), nil
 	}
 
-	if metric_type == "counter" {
+	if metricType == "counter" {
 		val, ok := storage.counters[name]
 		if !ok {
 			return "", fmt.Errorf("metric %s of type counter not found", name)

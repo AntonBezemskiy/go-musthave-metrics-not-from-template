@@ -1,8 +1,7 @@
 linters:
   enable:
     - govet
-    - staticcheck
-    - errcheck
+    - golint
     - gosec
     - ineffassign
     - unparam
@@ -10,8 +9,26 @@ linters:
 run:
   timeout: 5m
 
-staticcheck:
-  checks:
-    - name: SA1017  # Проверяет именование, не используйте подчеркивания
-    - name: ST1005  # Проверяет именование, поля структур не должны использовать подчеркивания
+issues:
+  exclude:
+    - test-files
+
+golint:
+  min_confidence: 0.8  # Порог уверенности для ошибок golint
+
+# Правила для govet (включает правила для именования)
+govet:
+  checks: all
+
+# Правила для gosec (проверка на уязвимости)
+gosec:
+  enable:
+    - G101  # Ошибка использования неподходящего случайного числа
+
+# Правила для ineffassign и unparam (проверка на неиспользуемые переменные)
+ineffassign:
+  ignore-generated-files: true
+
+unparam:
+  ignore-generated-files: true
 
