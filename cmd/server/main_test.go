@@ -172,5 +172,6 @@ func TestHandlerUpdate(t *testing.T) {
 		resp := testRequest(t, ts, "POST", tt.request)
 		assert.Equal(t, tt.want.code, resp.StatusCode)
 		assert.Equal(t, tt.want.storage, tt.arg)
+		resp.Body.Close()
 	}
 }
