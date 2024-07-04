@@ -96,7 +96,7 @@ func TestNewMemStorage(t *testing.T) {
 	}
 }
 
-func TestMemStorageAddGauge(t *testing.T) {
+func TestMemStorage_AddGauge(t *testing.T) {
 	type args struct {
 		stor  *MemStorage
 		name  string
@@ -133,7 +133,7 @@ func TestMemStorageAddGauge(t *testing.T) {
 	}
 }
 
-func TestMemStorageAddCounter(t *testing.T) {
+func TestMemStorage_AddCounter(t *testing.T) {
 	type args struct {
 		stor  *MemStorage
 		name  string
@@ -170,14 +170,14 @@ func TestMemStorageAddCounter(t *testing.T) {
 	}
 }
 
-func TestMemStorageGetMetric(t *testing.T) {
+func TestMemStorage_GetMetric(t *testing.T) {
 	type fields struct {
 		gauges   map[string]float64
 		counters map[string]int64
 	}
 	type args struct {
-		metric_type string
-		name        string
+		metricType string
+		name       string
 	}
 	tests := []struct {
 		name    string
@@ -193,8 +193,8 @@ func TestMemStorageGetMetric(t *testing.T) {
 				counters: map[string]int64{"counter1": 100, "counter2": 7},
 			},
 			args: args{
-				metric_type: "gauge",
-				name:        "gauge1",
+				metricType: "gauge",
+				name:       "gauge1",
 			},
 			want:    fmt.Sprintf("%g", 17.77),
 			wantErr: false,
@@ -206,8 +206,8 @@ func TestMemStorageGetMetric(t *testing.T) {
 				counters: map[string]int64{"counter1": 100, "counter2": 7},
 			},
 			args: args{
-				metric_type: "gauge",
-				name:        "gauge2",
+				metricType: "gauge",
+				name:       "gauge2",
 			},
 			want:    fmt.Sprintf("%g", 14.9),
 			wantErr: false,
@@ -219,8 +219,8 @@ func TestMemStorageGetMetric(t *testing.T) {
 				counters: map[string]int64{"counter1": 100, "counter2": 7},
 			},
 			args: args{
-				metric_type: "gauge",
-				name:        "gauge3",
+				metricType: "gauge",
+				name:       "gauge3",
 			},
 			want:    "",
 			wantErr: true,
@@ -232,8 +232,8 @@ func TestMemStorageGetMetric(t *testing.T) {
 				counters: map[string]int64{"counter1": 100, "counter2": 7},
 			},
 			args: args{
-				metric_type: "counter",
-				name:        "counter1",
+				metricType: "counter",
+				name:       "counter1",
 			},
 			want:    "100",
 			wantErr: false,
@@ -245,8 +245,8 @@ func TestMemStorageGetMetric(t *testing.T) {
 				counters: map[string]int64{"counter1": 100, "counter2": 7},
 			},
 			args: args{
-				metric_type: "counter",
-				name:        "counter100",
+				metricType: "counter",
+				name:       "counter100",
 			},
 			want:    "",
 			wantErr: true,
@@ -258,7 +258,7 @@ func TestMemStorageGetMetric(t *testing.T) {
 				gauges:   tt.fields.gauges,
 				counters: tt.fields.counters,
 			}
-			got, err := storage.GetMetric(tt.args.metric_type, tt.args.name)
+			got, err := storage.GetMetric(tt.args.metricType, tt.args.name)
 			if !tt.wantErr {
 				assert.NoError(t, err)
 			}
@@ -267,7 +267,7 @@ func TestMemStorageGetMetric(t *testing.T) {
 	}
 }
 
-func TestMemStorageGetAllMetrics(t *testing.T) {
+func TestMemStorage_GetAllMetrics(t *testing.T) {
 	type fields struct {
 		gauges   map[string]float64
 		counters map[string]int64
