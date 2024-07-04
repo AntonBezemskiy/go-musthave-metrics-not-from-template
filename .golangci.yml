@@ -1,0 +1,23 @@
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - errcheck
+    - gosec
+    - ineffassign
+    - unparam
+
+run:
+  timeout: 5m
+
+issues:
+  exclude:
+    - test-files
+  include:
+    - '**/*_test.go'
+
+staticcheck:
+  checks:
+    - name: SA1017  # Проверяет именование, не используйте подчеркивания
+    - name: ST1005  # Проверяет именование, поля структур не должны использовать подчеркивания
+

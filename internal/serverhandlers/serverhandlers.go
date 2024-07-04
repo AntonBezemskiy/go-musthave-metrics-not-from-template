@@ -2,6 +2,7 @@ package serverhandlers
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -32,7 +33,8 @@ func GetGlobal(res http.ResponseWriter, req *http.Request, storage repositories.
         </body>
         </html>
     `))
-	tmpl.Execute(res, metrics)
+	err := tmpl.Execute(res, metrics)
+	log.Print(err)
 }
 
 func GetMetric(res http.ResponseWriter, req *http.Request, storage repositories.Repositories) {
@@ -44,7 +46,8 @@ func GetMetric(res http.ResponseWriter, req *http.Request, storage repositories.
 	if err != nil {
 		res.WriteHeader(http.StatusNotFound)
 	}
-	res.Write([]byte(value))
+	_, er := res.Write([]byte(value))
+	log.Print(er)
 }
 
 // Благодаря использованию роутера chi в этот хэндлер будут попадать только запросы POST

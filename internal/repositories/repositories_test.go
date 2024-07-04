@@ -96,7 +96,7 @@ func TestNewMemStorage(t *testing.T) {
 	}
 }
 
-func TestMemStorage_AddGauge(t *testing.T) {
+func TestMemStorageAddGauge(t *testing.T) {
 	type args struct {
 		stor  *MemStorage
 		name  string
@@ -133,7 +133,7 @@ func TestMemStorage_AddGauge(t *testing.T) {
 	}
 }
 
-func TestMemStorage_AddCounter(t *testing.T) {
+func TestMemStorageAddCounter(t *testing.T) {
 	type args struct {
 		stor  *MemStorage
 		name  string
@@ -170,7 +170,7 @@ func TestMemStorage_AddCounter(t *testing.T) {
 	}
 }
 
-func TestMemStorage_GetMetric(t *testing.T) {
+func TestMemStorageGetMetric(t *testing.T) {
 	type fields struct {
 		gauges   map[string]float64
 		counters map[string]int64
@@ -267,7 +267,7 @@ func TestMemStorage_GetMetric(t *testing.T) {
 	}
 }
 
-func TestMemStorage_GetAllMetrics(t *testing.T) {
+func TestMemStorageGetAllMetrics(t *testing.T) {
 	type fields struct {
 		gauges   map[string]float64
 		counters map[string]int64
