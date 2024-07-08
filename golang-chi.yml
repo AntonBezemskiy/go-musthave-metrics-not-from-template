@@ -1,0 +1,23 @@
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - errcheck
+    - gosec
+    - ineffassign
+    - unparam
+
+run:
+  timeout: 5m
+
+issues:
+  exclude:
+    - test-files
+  include:
+    - path: _test\.go
+
+staticcheck:
+  checks:
+    - name: SA1017
+    - name: ST1005
+
